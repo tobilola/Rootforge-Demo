@@ -14,7 +14,7 @@ st.set_page_config(page_title="Rootforge", page_icon="◆", layout="wide",
 # and quotes read like terminal output, because that is what they are: the
 # machine showing its work). Everything derives from these tokens.
 # ---------------------------------------------------------------------------
-st.markdown("""
+st.html("""
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
 <style>
@@ -117,7 +117,7 @@ html, body, [class*="css"]{ font-family:'Inter',system-ui,sans-serif; }
 [data-testid="stExpander"]{ border:1px solid var(--line); border-radius:10px; background:#fff; }
 hr{ border:none; border-top:1px solid var(--line); margin:1rem 0; }
 </style>
-""", unsafe_allow_html=True)
+""")
 
 CHIP = {
     "verified": ('<span class="chip ok"><span class="dot"></span>Verified</span>'),
@@ -213,7 +213,7 @@ with setup:
         "live against the displayed source documents. Anything that fails is excluded "
         "from confirmed findings and retained for reviewer inspection.")
 
-    if st.button("Run investigation", use_container_width=True):
+    if st.button("Run investigation", width="stretch"):
         with st.spinner("Reading evidence · reconstructing · verifying"):
             try:
                 st.session_state["inv"] = run_investigation(
@@ -317,7 +317,7 @@ with review:
     else:
         st.markdown('<div class="sec"><span class="n">06</span>Draft corrective &amp; preventive actions</div>',
                     unsafe_allow_html=True)
-        edited = st.data_editor(inv["capa"], use_container_width=True,
+        edited = st.data_editor(inv["capa"], width="stretch",
                                 num_rows="dynamic", key="capa_editor")
         if hasattr(edited, "to_dict"):
             edited = edited.to_dict(orient="records")
@@ -342,7 +342,7 @@ with review:
                          reviewer, decision, notes),
             file_name=f"Rootforge_{CASE['id']}_Investigation_Draft.docx",
             mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            use_container_width=True)
+            width="stretch")
 
 st.markdown(
     '<div class="rf-footer">Rootforge · Human-reviewed investigation support · Synthetic demonstration</div>',

@@ -1,1 +1,195 @@
-
+{
+  "_model": "recorded run (claude-sonnet-4-6, 2026-07-21)",
+  "timeline": [
+    {
+      "time": "09:05",
+      "text": "Sample RF-104 collected in Clinic Room 2 by nurse practitioner PJ.",
+      "refs": ["DEV-001"],
+      "quote": "Sample RF-104 was collected at 09:05 on 14 July 2026 in Clinic Room 2.",
+      "confidence": "High"
+    },
+    {
+      "time": "09:05",
+      "text": "Sample placed in the transport rack outside the clinic room; no custody record from this point.",
+      "refs": ["EMAIL-PJ-14JUL"],
+      "quote": "I drew RF-104 first thing and put it in the transport rack outside room 2 as usual.",
+      "confidence": "Medium"
+    },
+    {
+      "time": "09:50",
+      "text": "SOP-014 v3 escalation trigger reached (45 minutes from collection). No escalation recorded.",
+      "refs": ["SOP-014-v3", "LOG-14JUL-RF104"],
+      "quote": "Where a delay beyond 45 minutes from collection is expected, the receiving technician must escalate to the study coordinator by telephone",
+      "confidence": "High"
+    },
+    {
+      "time": "10:05",
+      "text": "Protocol 60-minute processing deadline expired.",
+      "refs": ["PRO-7.2"],
+      "quote": "Whole-blood samples for the biomarker sub-study must begin processing within 60 minutes of collection.",
+      "confidence": "High"
+    },
+    {
+      "time": "10:17",
+      "text": "Receipt time entered in the handoff log with no receiver identified.",
+      "refs": ["LOG-14JUL-RF104"],
+      "quote": "Receipt time: 10:17. Receiver initials: [blank].",
+      "confidence": "Medium"
+    },
+    {
+      "time": "10:40",
+      "text": "Processing began, 95 minutes after collection, performed by technician LM.",
+      "refs": ["DEV-001", "LOG-14JUL-RF104"],
+      "quote": "Processing began at 10:40 in the on-site processing laboratory.",
+      "confidence": "High"
+    },
+    {
+      "time": "End of day",
+      "text": "Deviation identified by the quality function during routine sample-log review, not at the point of occurrence.",
+      "refs": ["DEV-001"],
+      "quote": "The delay was discovered during end-of-day review of the sample log on 14 July 2026 by the quality function.",
+      "confidence": "High"
+    }
+  ],
+  "findings": {
+    "confirmed": [
+      {
+        "text": "Processing began 95 minutes after collection, exceeding the protocol's 60-minute limit by 35 minutes.",
+        "refs": ["DEV-001", "PRO-7.2"],
+        "quote": "Processing began at 10:40 in the on-site processing laboratory."
+      },
+      {
+        "text": "SOP-014 v3 was in force on the day of the event, having taken effect thirteen days earlier.",
+        "refs": ["SOP-014-v3"],
+        "quote": "Effective 1 July 2026. Supersedes SOP-014 v2."
+      },
+      {
+        "text": "The 45-minute escalation trigger was introduced in v3 and did not exist in the version the processing technician was trained on.",
+        "refs": ["SOP-014-v3"],
+        "quote": "Change note versus v2: the 45-minute escalation trigger in 4.2 is new in v3."
+      },
+      {
+        "text": "No escalation to the study coordinator was recorded at any point.",
+        "refs": ["LOG-14JUL-RF104"],
+        "quote": "Escalation recorded: none."
+      },
+      {
+        "text": "Technician LM's training on the current SOP version was assigned but never completed.",
+        "refs": ["TR-LM-2026"],
+        "quote": "SOP-014 v3 - Sample Receipt and Processing. Assigned 2 July 2026. Status: Assigned. No completion date recorded."
+      }
+    ],
+    "missing": [
+      {
+        "text": "The identity of the person who received the sample at 10:17 is not recorded, so custody cannot be established for the 72 minutes after collection.",
+        "refs": ["LOG-14JUL-RF104"],
+        "quote": "Receipt time: 10:17. Receiver initials: [blank]."
+      },
+      {
+        "text": "No transport record exists between collection and receipt; the field was left empty rather than marked not applicable.",
+        "refs": ["LOG-14JUL-RF104"],
+        "quote": "Transport to laboratory: field left blank."
+      },
+      {
+        "text": "The collector states she does not know who transported the sample, so the gap cannot be closed from her account.",
+        "refs": ["EMAIL-PJ-14JUL"],
+        "quote": "I do not know who took it across to the lab or when."
+      },
+      {
+        "text": "Sample disposition has not been determined by the principal investigator as the protocol requires for out-of-window samples.",
+        "refs": ["PRO-7.2", "DEV-001"],
+        "quote": "Reported impact: unknown at time of writing."
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The handoff log records a 10:17 receipt, but the quality function notes the entry appears to have been made after the fact, so the recorded time may not reflect actual receipt.",
+        "refs": ["LOG-14JUL-RF104"],
+        "quote": "receipt entry appears to have been completed retrospectively; handwriting differs from the collection entry"
+      },
+      {
+        "text": "SOP-014 v3 requires the receiving technician to record receipt including initials, yet the log shows a receipt time with no receiver, meaning either the SOP was not followed or the entry was not made by a receiving technician.",
+        "refs": ["SOP-014-v3", "LOG-14JUL-RF104"],
+        "quote": "The receiving technician must record receipt in the sample handoff log, including printed name or initials"
+      }
+    ]
+  },
+  "hypotheses": [
+    {
+      "statement": "The sample sat unattended in the transport rack because no individual owned the transfer step between clinic and laboratory.",
+      "reasoning": "The collector placed the sample in a rack and considered her task complete; the transport field is blank; no receiver is identified; 72 minutes are unaccounted for. The process appears to assume someone will collect the rack without naming who.",
+      "refs": ["EMAIL-PJ-14JUL", "LOG-14JUL-RF104"],
+      "confidence": "Medium",
+      "disconfirming_evidence": "A courier log, rota, or CCTV showing a named person collected the sample promptly would rule this out.",
+      "status": "Needs investigation"
+    },
+    {
+      "statement": "The escalation did not occur because the technician was operating under the superseded v2 rule, under which no escalation was due until the 60-minute limit had already passed.",
+      "reasoning": "LM completed v2 training only; v3 training was assigned but not completed; the 45-minute trigger is new in v3. A technician following v2 would not have recognised 09:50 as an action point.",
+      "refs": ["TR-LM-2026", "SOP-014-v3"],
+      "confidence": "Medium",
+      "disconfirming_evidence": "Evidence that LM was briefed on the v3 change outside formal training, or that LM did not have the sample before 10:17 and so could not have escalated.",
+      "status": "Needs verification"
+    },
+    {
+      "statement": "Change control released SOP v3 into effect without confirming that affected staff had completed training on it.",
+      "reasoning": "v3 took effect 1 July; training was assigned 2 July, a day after the effective date, and remained incomplete thirteen days later while the technician continued to perform the activity.",
+      "refs": ["SOP-014-v3", "TR-LM-2026"],
+      "confidence": "Medium",
+      "disconfirming_evidence": "A documented change-control gate showing training completion was verified before release, and that LM was excluded from the activity until trained.",
+      "status": "Needs verification"
+    },
+    {
+      "statement": "The deviation was detectable in real time but no control existed to surface it, so it was only found at end-of-day review.",
+      "reasoning": "Both the 45-minute and 60-minute thresholds passed without any recorded action, and discovery came from a retrospective log review rather than from anyone involved on the day.",
+      "refs": ["DEV-001", "LOG-14JUL-RF104"],
+      "confidence": "Low",
+      "disconfirming_evidence": "An alerting mechanism that did fire and was acknowledged, or evidence that staff raised the delay verbally without recording it.",
+      "status": "Needs investigation"
+    }
+  ],
+  "capa": [
+    {
+      "type": "Correction",
+      "text": "Obtain principal investigator determination of RF-104 sample disposition and document the scientific assessment of analyte stability.",
+      "owner_role": "Study coordinator",
+      "refs": ["PRO-7.2", "DEV-001"],
+      "rationale": "Protocol 7.2.3 requires PI determination for out-of-window samples; the deviation report records impact as unknown."
+    },
+    {
+      "type": "Corrective",
+      "text": "Interview the collector, all staff with laboratory access on 14 July, and technician LM to reconstruct custody between 09:05 and 10:17; document who made the 10:17 entry and when.",
+      "owner_role": "Quality lead",
+      "refs": ["LOG-14JUL-RF104", "EMAIL-PJ-14JUL"],
+      "rationale": "Addresses the unidentified receiver and the retrospective log entry."
+    },
+    {
+      "type": "Corrective",
+      "text": "Complete and document SOP-014 v3 training for LM and all staff with the v3 assignment outstanding; restrict sample receipt to trained staff until complete.",
+      "owner_role": "Lab manager",
+      "refs": ["TR-LM-2026", "SOP-014-v3"],
+      "rationale": "SOP-014 v3 section 6.0 requires current-version training before performing the activity."
+    },
+    {
+      "type": "Preventive",
+      "text": "Add a named-owner transport step to the handoff log with a mandatory receiver signature, and reject log entries missing the receiver field.",
+      "owner_role": "Operations lead",
+      "refs": ["LOG-14JUL-RF104"],
+      "rationale": "Addresses the ownership gap hypothesis at the point where custody was lost."
+    },
+    {
+      "type": "Preventive",
+      "text": "Amend the change-control procedure so that an SOP version cannot take effect until training completion is confirmed for all staff performing the affected activity.",
+      "owner_role": "Quality lead",
+      "refs": ["SOP-014-v3", "TR-LM-2026"],
+      "rationale": "Addresses the systemic pattern rather than this single training gap."
+    },
+    {
+      "type": "Preventive",
+      "text": "Implement a 45-minute elapsed-time alert on collected samples awaiting processing, routed to the study coordinator.",
+      "owner_role": "Operations lead",
+      "refs": ["SOP-014-v3"],
+      "rationale": "Makes the v3 escalation trigger detectable at the moment it is reached rather than at end-of-day review."
+    }
+  ]
+}

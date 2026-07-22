@@ -1,9 +1,14 @@
+from pathlib import Path
+import sys
+
+PROJECT_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 import streamlit as st
 
 from rootforge.engine import EngineError, run_investigation
 from rootforge.report import build_report
 from rootforge.sources import CASE, DOCUMENTS
-
 
 st.set_page_config(page_title="Rootforge", page_icon="🔎", layout="wide")
 st.markdown(

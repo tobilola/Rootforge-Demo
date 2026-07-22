@@ -3,13 +3,44 @@
 import pytest
 
 from rootforge.engine import run_investigation
-from rootforge.sources import CASE, DOCUMENTS_BY_REF
+from rootforge.sources import CASE, CASES, DOCUMENTS_BY_REF, by_ref_for, corpus_for
 from rootforge.verify import verify_claim, verify_investigation
 
 
 @pytest.fixture(scope="module")
 def investigation():
     return run_investigation(CASE)
+
+
+@pytest.fixture(scope="module")
+def catch_case():
+    entry = CASES["RF-DEMO-002"]
+    return run_investigation(entry["case"], corpus_for("RF-DEMO-002"),
+                             by_ref_for("RF-DEMO-002"))
+
+
+# --- The catch: case 2 must flag the planted fabrication ----------------
+
+def test_catch_case_flags_exactly_one_claim(catch_case):
+    """The demo's wow moment must be reproducible: one, and only one, claim
+    is caught, and it is the invented back-dating motive."""
+    failures = catch_case["verification"]["failures"]
+    assert len(failures) == 1, failures
+    assert "back-dated" in failures[0]["text"].lower()
+
+
+def test_catch_case_quarantines_not_deletes(catch_case):
+    """The flagged claim must still be present, marked, not silently removed."""
+    confirmed = catch_case["findings"]["confirmed"]
+    flagged = [c for c in confirmed
+               if c["verification"]["status"] in ("unverified", "bad_ref")]
+    assert len(flagged) == 1
+    assert flagged[0]["quote"]  # the fabricated quote is retained for the reviewer
+
+
+def test_catch_case_still_grounds_the_real_findings(catch_case):
+    """Catching one fabrication must not poison the genuine findings."""
+    assert catch_case["verification"]["pass_rate"] > 0.9
 
 
 # --- Grounding: the core safety property --------------------------------

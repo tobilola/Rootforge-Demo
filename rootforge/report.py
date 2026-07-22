@@ -19,9 +19,27 @@ STATUS_MARK = {
 
 
 def _cite(item):
-    refs = "; ".join(item.get("refs", [])) or "no citation"
-    mark = STATUS_MARK.get(item.get("verification", {}).get("status", ""), "")
-    return f" [Source: {refs}]{mark}"
+    if not isinstance(item, dict):
+        return ""
+
+    refs = item.get("refs", [])
+    if isinstance(refs, str):
+        refs_text = refs
+    elif isinstance(refs, (list, tuple)):
+        refs_text = "; ".join(str(ref) for ref in refs)
+    else:
+        refs_text = "no citation"
+
+    verification = item.get("verification", {})
+    if isinstance(verification, dict):
+        status = verification.get("status", "")
+    elif isinstance(verification, str):
+        status = verification
+    else:
+        status = ""
+
+    mark = STATUS_MARK.get(status, "")
+    return f" [Source: {refs_text or 'no citation'}]{mark}"
 
 
 def build_report(case, investigation, documents, reviewer, decision, notes):

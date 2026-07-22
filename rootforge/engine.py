@@ -119,7 +119,16 @@ def provider() -> str:
     return "replay"
 
 
-REPLAY_PATH = os.path.join(os.path.dirname(__file__), "replay", "RF-DEMO-001.json")
+REPLAY_DIR = os.path.join(os.path.dirname(__file__), "replay")
+
+
+def _replay_file(case: dict) -> str:
+    """Map a case to its recorded run, defaulting to the id-based filename."""
+    from .sources import CASES
+
+    entry = CASES.get(case.get("id"), {})
+    name = entry.get("replay") or f"{case.get('id', 'RF-DEMO-001')}.json"
+    return os.path.join(REPLAY_DIR, name)
 
 
 def run_investigation(case: dict, corpus: str | None = None,
@@ -135,7 +144,7 @@ def run_investigation(case: dict, corpus: str | None = None,
     started = time.time()
 
     if prov == "replay":
-        with open(REPLAY_PATH) as fh:
+        with open(_replay_file(case)) as fh:
             data = json.load(fh)
         model_name = data.pop("_model", "recorded run")
     else:

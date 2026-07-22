@@ -1,1 +1,2 @@
-"""Rootforge YC demonstration package."""
+"""Rootforge: AI investigation for regulated clinical research."""
+__version__ = "0.2.0"

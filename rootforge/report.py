@@ -28,7 +28,7 @@ def _cite(item):
     elif isinstance(refs, (list, tuple)):
         refs_text = "; ".join(str(ref) for ref in refs)
     else:
-        refs_text = "no citation"
+        refs_text = ""
 
     verification = item.get("verification", {})
     if isinstance(verification, dict):
@@ -40,6 +40,15 @@ def _cite(item):
 
     mark = STATUS_MARK.get(status, "")
     return f" [Source: {refs_text or 'no citation'}]{mark}"
+
+
+def _is_grounded(item):
+    if not isinstance(item, dict):
+        return False
+    verification = item.get("verification", {})
+    return isinstance(verification, dict) and verification.get("status") in (
+        "verified", "paraphrase"
+    )
 
 
 def build_report(case, investigation, documents, reviewer, decision, notes):
@@ -65,9 +74,10 @@ def build_report(case, investigation, documents, reviewer, decision, notes):
         doc.add_paragraph(line, style="List Bullet")
 
     if ver.get("failures"):
+        doc.add_heading("Flagged model assertions — excluded from confirmed findings", level=1)
         doc.add_paragraph(
             "The following statements did not resolve to source text and are "
-            "retained for reviewer attention rather than removed:"
+            "excluded from confirmed findings and retained for reviewer inspection:"
         )
         for f in ver["failures"]:
             doc.add_paragraph(f"{f['text']} — {f['detail']}", style="List Bullet")
@@ -90,6 +100,8 @@ def build_report(case, investigation, documents, reviewer, decision, notes):
         if not items:
             doc.add_paragraph("None identified.")
         for item in items:
+            if not _is_grounded(item):
+                continue
             doc.add_paragraph(item.get("text", "") + _cite(item), style="List Bullet")
 
     doc.add_heading("Root-cause hypotheses (not conclusions)", level=1)
@@ -108,6 +120,8 @@ def build_report(case, investigation, documents, reviewer, decision, notes):
 
     doc.add_heading("Draft corrective and preventive actions", level=1)
     for a in investigation.get("capa", []):
+        if not isinstance(a, dict):
+            continue
         owner = a.get("owner_role") or a.get("owner", "Unassigned")
         due = f" Due: {a['due']}." if a.get("due") else ""
         doc.add_paragraph(

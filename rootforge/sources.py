@@ -113,15 +113,131 @@ DOCUMENTS = [
     },
 ]
 
-DOCUMENTS_BY_REF = {d["ref"]: d for d in DOCUMENTS}
+# ---------------------------------------------------------------------------
+# Second case. Same shape, different failure. This one exists to demonstrate
+# the verifier CATCHING an over-reach: on this evidence a model is tempted to
+# assert *why* the consent was mis-dated ("the coordinator back-dated it to
+# stay within the window"), which no document supports. The recorded run does
+# exactly that, and verify.py flags it red. Nothing here states a motive; the
+# documents support only that the dates disagree.
+# ---------------------------------------------------------------------------
+
+CASE_2 = {
+    "id": "RF-DEMO-002",
+    "title": "Consent form dated after the first study procedure",
+    "reported_by": "Monitoring visit, Sponsor CRA",
+    "reported_on": "2026-07-18",
+}
+
+DOCUMENTS_2 = [
+    {
+        "ref": "MON-002",
+        "name": "Monitoring Visit Finding",
+        "kind": "incident record",
+        "text": (
+            "MONITORING FINDING MON-002. Study RF-CARD-2026-02, Subject 019.\n"
+            "During source data verification the CRA found the informed consent "
+            "form for Subject 019 is dated 16 July 2026. The first study-specific "
+            "procedure, a fasting blood draw, is recorded as performed on "
+            "15 July 2026. A study procedure appears to precede documented consent "
+            "by one day. Raised as a potential ICH-GCP consent deviation."
+        ),
+    },
+    {
+        "ref": "ICF-019",
+        "name": "Informed Consent Form, Subject 019",
+        "kind": "consent record",
+        "text": (
+            "INFORMED CONSENT FORM. Study RF-CARD-2026-02. Subject 019.\n"
+            "Subject signature present. Subject date field: 16 July 2026.\n"
+            "Person obtaining consent: Study Coordinator DR. Coordinator signature "
+            "present. Coordinator date field: 16 July 2026.\n"
+            "Version: Main ICF v4.0. No witness section completed."
+        ),
+    },
+    {
+        "ref": "PROC-019",
+        "name": "Procedure Log, Subject 019",
+        "kind": "log",
+        "text": (
+            "PROCEDURE LOG. Subject 019.\n"
+            "15 July 2026, 08:10. Fasting blood draw performed. Phlebotomist: MT.\n"
+            "16 July 2026, 09:30. Baseline ECG performed. Technician: SH.\n"
+            "Note: the 15 July entry has an asterisk; no legend for the asterisk "
+            "is present on this page."
+        ),
+    },
+    {
+        "ref": "EMAIL-DR-18JUL",
+        "name": "Email, Coordinator DR to Principal Investigator",
+        "kind": "correspondence",
+        "text": (
+            "From: DR. To: PI. Sent: 18 July 2026 11:04.\n"
+            "Subject: RE: Subject 019 consent query\n"
+            "I remember consenting Subject 019 and I am sure we talked through the "
+            "form before anything was done. I filled in the dates when I completed "
+            "the file. I cannot say from memory what date I wrote against the "
+            "signatures. I have not compared the form to the procedure log."
+        ),
+    },
+    {
+        "ref": "DELEG-CARD02",
+        "name": "Delegation Log Extract",
+        "kind": "log",
+        "text": (
+            "DELEGATION LOG, Study RF-CARD-2026-02.\n"
+            "Coordinator DR: authorised to obtain informed consent from 1 June 2026. "
+            "Phlebotomist MT: authorised for sample collection from 1 June 2026.\n"
+            "No entry delegates consent to any other staff member."
+        ),
+    },
+]
+
+
+def _by_ref(docs):
+    return {d["ref"]: d for d in docs}
+
+
+def _corpus(docs):
+    return "\n\n".join(
+        f"<document ref=\"{d['ref']}\" name=\"{d['name']}\" kind=\"{d['kind']}\">\n"
+        f"{d['text']}\n</document>"
+        for d in docs
+    )
+
+
+# Registry: everything the app and engine need, keyed by case id.
+CASES = {
+    CASE["id"]: {
+        "case": CASE,
+        "documents": DOCUMENTS,
+        "replay": "RF-DEMO-001.json",
+        "blurb": "The clean run. 28 of 28 claims ground, 18 by exact match.",
+    },
+    CASE_2["id"]: {
+        "case": CASE_2,
+        "documents": DOCUMENTS_2,
+        "replay": "RF-DEMO-002.json",
+        "blurb": "The catch. The model asserts a motive the record never states, "
+                 "and the verifier flags it before a reviewer sees it.",
+    },
+}
+
+DOCUMENTS_BY_REF = _by_ref(DOCUMENTS)
+
+
+def documents_for(case_id: str):
+    return CASES[case_id]["documents"]
+
+
+def by_ref_for(case_id: str):
+    return _by_ref(CASES[case_id]["documents"])
+
+
+def corpus_for(case_id: str) -> str:
+    return _corpus(CASES[case_id]["documents"])
 
 
 def corpus_text() -> str:
-    """Render the corpus as the model sees it, with citation handles."""
-    blocks = []
-    for d in DOCUMENTS:
-        blocks.append(
-            f"<document ref=\"{d['ref']}\" name=\"{d['name']}\" kind=\"{d['kind']}\">\n"
-            f"{d['text']}\n</document>"
-        )
-    return "\n\n".join(blocks)
+    """Backwards-compatible: corpus for the default (first) case."""
+    return _corpus(DOCUMENTS)

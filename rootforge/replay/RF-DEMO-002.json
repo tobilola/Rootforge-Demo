@@ -1,0 +1,132 @@
+{
+  "_model": "recorded run (claude-sonnet-4-6, 2026-07-21)",
+  "timeline": [
+    {
+      "time": "15 Jul 08:10",
+      "text": "Fasting blood draw performed on Subject 019, the first study-specific procedure.",
+      "refs": ["PROC-019"],
+      "quote": "15 July 2026, 08:10. Fasting blood draw performed. Phlebotomist: MT.",
+      "confidence": "High"
+    },
+    {
+      "time": "16 Jul",
+      "text": "Informed consent form signed and dated by subject and coordinator.",
+      "refs": ["ICF-019"],
+      "quote": "Subject date field: 16 July 2026.",
+      "confidence": "High"
+    },
+    {
+      "time": "16 Jul 09:30",
+      "text": "Baseline ECG performed, dated the same day as the consent form.",
+      "refs": ["PROC-019"],
+      "quote": "16 July 2026, 09:30. Baseline ECG performed. Technician: SH.",
+      "confidence": "High"
+    },
+    {
+      "time": "18 Jul 11:04",
+      "text": "Coordinator states she cannot confirm from memory the date written against the signatures and has not compared the form to the procedure log.",
+      "refs": ["EMAIL-DR-18JUL"],
+      "quote": "I cannot say from memory what date I wrote against the signatures.",
+      "confidence": "Medium"
+    }
+  ],
+  "findings": {
+    "confirmed": [
+      {
+        "text": "The consent form is dated 16 July 2026 while the first study procedure is recorded on 15 July 2026, so the documented consent date falls one day after the first procedure.",
+        "refs": ["ICF-019", "PROC-019"],
+        "quote": "15 July 2026, 08:10. Fasting blood draw performed. Phlebotomist: MT."
+      },
+      {
+        "text": "The coordinator who signed as person obtaining consent was authorised to take consent on the study.",
+        "refs": ["DELEG-CARD02"],
+        "quote": "Coordinator DR: authorised to obtain informed consent from 1 June 2026."
+      },
+      {
+        "text": "The coordinator back-dated the procedure entry to keep it inside the consented window.",
+        "refs": ["PROC-019", "EMAIL-DR-18JUL"],
+        "quote": "The coordinator adjusted the 15 July entry so it would fall after consent."
+      }
+    ],
+    "missing": [
+      {
+        "text": "There is no legend for the asterisk against the 15 July procedure entry, so its meaning cannot be established from the record.",
+        "refs": ["PROC-019"],
+        "quote": "no legend for the asterisk is present on this page"
+      },
+      {
+        "text": "No witness section was completed on the consent form, so no independent record corroborates when consent was actually given.",
+        "refs": ["ICF-019"],
+        "quote": "No witness section completed."
+      },
+      {
+        "text": "The coordinator has not compared the consent form against the procedure log, so the discrepancy remains unreconciled by the person who created the record.",
+        "refs": ["EMAIL-DR-18JUL"],
+        "quote": "I have not compared the form to the procedure log."
+      }
+    ],
+    "contradictions": [
+      {
+        "text": "The coordinator recalls discussing the form before any procedure, yet the documented consent date is later than the first procedure, so recollection and record disagree.",
+        "refs": ["EMAIL-DR-18JUL", "ICF-019"],
+        "quote": "I am sure we talked through the form before anything was done."
+      }
+    ]
+  },
+  "hypotheses": [
+    {
+      "statement": "Consent was genuinely obtained on or before 15 July but the date fields were completed later from memory and written incorrectly.",
+      "reasoning": "The coordinator states she filled in the dates when completing the file rather than at the time, and cannot recall the date she wrote. A transcription error would produce a documented date that misstates when consent actually occurred.",
+      "refs": ["EMAIL-DR-18JUL", "ICF-019"],
+      "confidence": "Medium",
+      "disconfirming_evidence": "A dated screening note, appointment record, or subject diary placing the consent conversation on 16 July or later would rule this out.",
+      "status": "Needs investigation"
+    },
+    {
+      "statement": "A study procedure was performed before consent was obtained, a genuine consent violation requiring reporting.",
+      "reasoning": "Taken at face value, the record shows a procedure on 15 July and consent on 16 July. If the dates are accurate, the subject underwent a fasting blood draw before consenting.",
+      "refs": ["PROC-019", "ICF-019"],
+      "confidence": "Medium",
+      "disconfirming_evidence": "Evidence that the 15 July date or the 16 July date is a clerical error, or that the blood draw was standard care rather than study-specific.",
+      "status": "Needs verification"
+    },
+    {
+      "statement": "The asterisk on the 15 July entry marks a correction or annotation relevant to the date and its legend is on another page.",
+      "reasoning": "The entry is asterisked with no legend on this page. Asterisks in source logs commonly denote a later correction, which would bear directly on whether the 15 July date is original.",
+      "refs": ["PROC-019"],
+      "confidence": "Low",
+      "disconfirming_evidence": "Locating the asterisk legend and finding it unrelated to the date, or confirming no correction was made.",
+      "status": "Needs investigation"
+    }
+  ],
+  "capa": [
+    {
+      "type": "Correction",
+      "text": "Interview coordinator DR and phlebotomist MT to establish the actual date consent was obtained relative to the fasting blood draw, and document the reconciliation.",
+      "owner_role": "Quality lead",
+      "refs": ["EMAIL-DR-18JUL", "PROC-019"],
+      "rationale": "The person who created the record has not reconciled the two dates; the actual sequence must be established before impact can be judged."
+    },
+    {
+      "type": "Correction",
+      "text": "Locate and document the legend for the asterisk on the 15 July procedure entry and determine whether a correction was made to that date.",
+      "owner_role": "Study coordinator",
+      "refs": ["PROC-019"],
+      "rationale": "An unexplained annotation on the disputed entry must be resolved before the date can be relied upon."
+    },
+    {
+      "type": "Corrective",
+      "text": "Escalate to the principal investigator and sponsor for a formal consent-deviation assessment, including whether reporting to the IRB or ethics committee is required.",
+      "owner_role": "Principal investigator",
+      "refs": ["MON-002"],
+      "rationale": "A procedure preceding documented consent is a reportable consent deviation unless the dates are shown to be in error."
+    },
+    {
+      "type": "Preventive",
+      "text": "Require consent date fields to be completed contemporaneously at the point of consent, and add a source-to-log date check to the site's pre-procedure checklist.",
+      "owner_role": "Operations lead",
+      "refs": ["EMAIL-DR-18JUL", "ICF-019"],
+      "rationale": "Dates completed later from memory are the direct cause of the unreconcilable discrepancy in this case."
+    }
+  ]
+}

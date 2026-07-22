@@ -1,1 +1,0 @@
-"""Rootforge YC demonstration package."""

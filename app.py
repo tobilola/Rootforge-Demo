@@ -47,6 +47,44 @@ html, body, [class*="css"]{ font-family:'Inter',system-ui,sans-serif; }
 .rf-sub{ color:var(--mut); font-size:.95rem; }
 .rf-caseid{ font-family:'IBM Plex Mono'; font-size:.72rem; color:var(--sig);
   font-weight:600; letter-spacing:.04em; }
+.hero{ display:grid; grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr); gap:1rem;
+  margin:.7rem 0 1rem; align-items:stretch; }
+.hero-copy{ background:var(--ink); color:#fff; border-radius:18px; padding:1.45rem 1.55rem;
+  box-shadow:0 18px 40px rgba(11,31,42,.14); }
+.hero-kicker{ font-family:'IBM Plex Mono'; color:#8FE0C5; text-transform:uppercase;
+  letter-spacing:.14em; font-size:.65rem; font-weight:600; }
+.hero h1{ font-family:'Space Grotesk'; font-size:2.15rem; line-height:1.03;
+  letter-spacing:-.035em; margin:.55rem 0 .65rem; color:#fff; }
+.hero p{ color:#C9D8D3; margin:0; line-height:1.55; max-width:700px; }
+.promise{ background:#fff; border:1px solid var(--line); border-radius:18px; padding:1.15rem;
+  box-shadow:0 8px 24px rgba(11,31,42,.06); }
+.promise-label{ font-family:'IBM Plex Mono'; font-size:.62rem; color:var(--mut);
+  text-transform:uppercase; letter-spacing:.12em; }
+.promise-item{ display:flex; gap:.65rem; padding:.7rem 0; border-bottom:1px solid var(--line);
+  font-size:.86rem; color:var(--ink-2); line-height:1.35; }
+.promise-item:last-child{ border-bottom:0; padding-bottom:0; }
+.check{ color:var(--sig); font-weight:800; }
+.story{ display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem; margin:.65rem 0 1rem; }
+.story-card{ background:#fff; border:1px solid var(--line); border-radius:14px; padding:1rem; }
+.story-card b{ display:block; font-family:'Space Grotesk'; font-size:.95rem; margin:.25rem 0; }
+.story-card span{ color:var(--mut); font-size:.8rem; line-height:1.4; }
+.step{ font-family:'IBM Plex Mono'; color:var(--sig); font-size:.63rem; letter-spacing:.1em; }
+.reveal{ border:1px solid var(--sig-line); background:linear-gradient(135deg,#F1FBF7,#fff);
+  border-radius:16px; padding:1.15rem 1.25rem; margin:.8rem 0; }
+.reveal-label{ font-family:'IBM Plex Mono'; color:var(--sig); text-transform:uppercase;
+  letter-spacing:.1em; font-size:.64rem; font-weight:600; }
+.reveal h2{ font-family:'Space Grotesk'; font-size:1.28rem; line-height:1.25;
+  margin:.35rem 0; color:var(--ink); }
+.reveal p{ color:var(--mut); margin:.2rem 0 0; font-size:.88rem; }
+.repair-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:.65rem; margin:.6rem 0 1rem; }
+.repair{ background:#fff; border:1px solid var(--line); border-top:3px solid var(--blue);
+  border-radius:12px; padding:.85rem; }
+.repair b{ font-family:'Space Grotesk'; display:block; font-size:.88rem; margin-bottom:.3rem; }
+.repair span{ color:var(--mut); font-size:.78rem; line-height:1.4; }
+.safety{ border:1px solid var(--warn-line); background:var(--warn-bg); border-radius:16px;
+  padding:1.1rem 1.2rem; margin:.8rem 0; }
+.safety h2{ font-family:'Space Grotesk'; margin:.25rem 0; font-size:1.2rem; color:var(--warn); }
+.safety p{ margin:.2rem 0; color:#74443D; font-size:.86rem; }
 
 /* Verdict chip: the signature element */
 .chip{ display:inline-flex; align-items:center; gap:.4rem; font-family:'IBM Plex Mono';
@@ -116,6 +154,8 @@ html, body, [class*="css"]{ font-family:'Inter',system-ui,sans-serif; }
 .stTabs [aria-selected="true"]{ color:var(--ink)!important; }
 [data-testid="stExpander"]{ border:1px solid var(--line); border-radius:10px; background:#fff; }
 hr{ border:none; border-top:1px solid var(--line); margin:1rem 0; }
+@media(max-width:760px){ .hero,.story,.repair-grid{ grid-template-columns:1fr; }
+  .hero h1{ font-size:1.75rem; } .rail{ grid-template-columns:repeat(2,1fr); } }
 </style>
 """)
 
@@ -155,7 +195,7 @@ def claim_card(lead, item, category="confirmed"):
     st.markdown(html, unsafe_allow_html=True)
 
 
-# --- Masthead --------------------------------------------------------------
+# --- Outcome-led masthead --------------------------------------------------
 st.markdown(
     '<div class="rf-top"><div class="rf-mark"></div>'
     '<div class="rf-word">Rootforge</div>'
@@ -163,11 +203,37 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+st.markdown(
+    '<div class="hero"><div class="hero-copy">'
+    '<div class="hero-kicker">Evidence-grounded investigations</div>'
+    '<h1>From scattered records to a defensible action plan.</h1>'
+    '<p>Rootforge reconstructs what happened, connects failures across documents, '
+    'checks every assertion against source evidence, and shows operators exactly '
+    'what to repair.</p></div>'
+    '<div class="promise"><div class="promise-label">What the reviewer gets</div>'
+    '<div class="promise-item"><span class="check">✓</span><span><b>One traceable story</b><br>from procedures, logs, training and email</span></div>'
+    '<div class="promise-item"><span class="check">✓</span><span><b>Evidence on every claim</b><br>with unsupported assertions quarantined</span></div>'
+    '<div class="promise-item"><span class="check">✓</span><span><b>Repair suggestions</b><br>with owners and rationale for human review</span></div>'
+    '</div></div>', unsafe_allow_html=True)
+
 # --- Case selector ---------------------------------------------------------
 case_ids = list(CASES.keys())
-labels = {cid: f"{cid} · {CASES[cid]['case']['title']}" for cid in case_ids}
-chosen = st.radio("Case", case_ids, format_func=lambda c: labels[c],
-                  horizontal=True, label_visibility="collapsed")
+labels = {
+    "RF-DEMO-001": "Main investigation — find the operational failure",
+    "RF-DEMO-002": "AI safety check — catch an unsupported allegation",
+}
+st.markdown('<div class="sec"><span class="n">STEP 1</span>Choose the story to show</div>',
+            unsafe_allow_html=True)
+chosen = st.selectbox(
+    "Demo scenario",
+    case_ids,
+    format_func=lambda c: labels[c],
+    help="Start with the main investigation. Use the AI safety check briefly at the end.",
+)
+if chosen == "RF-DEMO-001":
+    st.caption("Recommended first: shows the operational discovery, its evidence, and a repair plan.")
+else:
+    st.caption("Use second: shows Rootforge rejecting one deliberately unsupported model assertion.")
 entry = CASES[chosen]
 CASE = entry["case"]
 
@@ -177,43 +243,41 @@ st.markdown(
     f'{esc(entry["blurb"])}</div>', unsafe_allow_html=True)
 
 prov = provider()
-if prov == "replay":
-    st.markdown(
-        '<div class="banner replay">◆ <div><b>Replay mode.</b> No API key set, so a '
-        'recorded run is being replayed for offline reliability. Grounding '
-        'verification runs live against source text either way. Set '
-        '<code>ANTHROPIC_API_KEY</code> to generate fresh.</div></div>',
-        unsafe_allow_html=True)
-else:
-    st.markdown(
-        f'<div class="banner live">◆ <div><b>Live · {esc(prov)}.</b> Every claim below '
-        'is checked against source text before you see it.</div></div>',
-        unsafe_allow_html=True)
+with st.expander("About this demonstration"):
+    if prov == "replay":
+        st.markdown("A recorded model response keeps the demo reliable. Rootforge's "
+                    "grounding verifier still runs live against the displayed source "
+                    "documents, and the reviewer can inspect every quote and citation.")
+    else:
+        st.markdown(f"Live model run via **{esc(prov)}**. Every generated claim is "
+                    "checked against source text before it reaches confirmed findings.")
 
 setup, evidence, timeline_tab, findings_tab, review = st.tabs(
-    ["Run", "Evidence", "Timeline", "Findings", "Report"]
+    ["1 · Run demo", "2 · Evidence", "3 · Timeline", "4 · Findings", "5 · Repair plan"]
 )
 
 with setup:
-    uploads = st.file_uploader(
-        "Add your own documents, or run the built-in synthetic case",
-        accept_multiple_files=True, type=["pdf", "docx", "txt", "md"])
+    st.markdown(
+        '<div class="story">'
+        '<div class="story-card"><div class="step">01 · INGEST</div><b>Read the whole record</b><span>Six documents that normally require manual cross-checking.</span></div>'
+        '<div class="story-card"><div class="step">02 · VERIFY</div><b>Prove every assertion</b><span>Quotes and citations resolve directly to source text.</span></div>'
+        '<div class="story-card"><div class="step">03 · REPAIR</div><b>Turn findings into action</b><span>Suggested controls, owners and rationale stay editable.</span></div>'
+        '</div>', unsafe_allow_html=True)
+    with st.expander("Use your own documents"):
+        uploads = st.file_uploader(
+            "Upload investigation records",
+            accept_multiple_files=True, type=["pdf", "docx", "txt", "md"])
     docs = load_uploads(uploads) if uploads else documents_for(chosen)
     corpus = corpus_from(docs) if uploads else corpus_for(chosen)
     refs = ", ".join(d["ref"] for d in docs)
     st.markdown(f'<div class="meta">{len(docs)} document(s) staged &nbsp;·&nbsp; '
                 f'<span class="ref">{esc(refs)}</span></div>', unsafe_allow_html=True)
 
-    st.markdown("")
-    st.markdown(
-        "In live mode, the documents are sent to the model as raw text. In replay "
-        "mode, this demonstration replays a recorded model response. The model "
-        "response contains a timeline, findings and hypotheses, each "
-        "carrying a citation and a verbatim quote. Every quote is then checked "
-        "live against the displayed source documents. Anything that fails is excluded "
-        "from confirmed findings and retained for reviewer inspection.")
-
-    if st.button("Run investigation", width="stretch"):
+    st.markdown('<div class="sec"><span class="n">STEP 2</span>Run Rootforge</div>',
+                unsafe_allow_html=True)
+    button_label = ("Run main investigation" if chosen == "RF-DEMO-001"
+                    else "Run AI safety check")
+    if st.button(button_label, width="stretch", type="primary"):
         with st.spinner("Reading evidence · reconstructing · verifying"):
             try:
                 st.session_state["inv"] = run_investigation(
@@ -244,7 +308,36 @@ with setup:
                 'The model asserted something the documents do not support. It is '
                 'excluded from confirmed findings and retained below and in the report '
                 'for reviewer inspection.</div></div>', unsafe_allow_html=True)
-        st.success("Investigation complete. Continue with the Timeline, Findings, and Report tabs above.")
+        if chosen == "RF-DEMO-001":
+            st.markdown(
+                '<div class="reveal"><div class="reveal-label">Key operational finding</div>'
+                '<h2>The control changed—but the operation did not.</h2>'
+                '<p>SOP v3 introduced a 45-minute escalation trigger. It was already in force, '
+                'but the technician had only completed training on v2. No escalation was recorded, '
+                'and processing started 95 minutes after collection.</p></div>',
+                unsafe_allow_html=True)
+            st.markdown('<div class="sec"><span class="n">REPAIR</span>Suggested control improvements</div>',
+                        unsafe_allow_html=True)
+            st.markdown(
+                '<div class="repair-grid">'
+                '<div class="repair"><b>Close the training gate</b><span>Prevent staff from receiving samples until current-version training is complete.</span></div>'
+                '<div class="repair"><b>Make custody explicit</b><span>Require a named transporter and receiver signature; reject incomplete handoffs.</span></div>'
+                '<div class="repair"><b>Trigger escalation early</b><span>Alert the coordinator when a collected sample reaches 45 minutes unprocessed.</span></div>'
+                '</div>', unsafe_allow_html=True)
+            st.info("Why this matters: Rootforge connected procedure change, training status, "
+                    "handoff evidence and the event log—then converted that connection into "
+                    "reviewable operating repairs.")
+        else:
+            failure = ver["failures"][0] if ver["failures"] else {}
+            st.markdown(
+                '<div class="safety"><div class="reveal-label">Safety layer activated</div>'
+                '<h2>Rootforge stopped an unsupported allegation.</h2>'
+                f'<p>The model claimed: “{esc(failure.get("text", ""))}” The cited quote does '
+                'not exist in the records, so the assertion was excluded from confirmed findings '
+                'and preserved for reviewer inspection.</p></div>', unsafe_allow_html=True)
+            st.success("Benefit: reviewers see the discrepancy without inheriting an invented motive.")
+        st.markdown("**Next:** open **3 · Timeline** to show what happened, then **4 · Findings** "
+                    "for the evidence, and finish in **5 · Repair plan** to show the operational benefit.")
 
 with evidence:
     for d in st.session_state.get("docs", documents_for(chosen)):
@@ -337,7 +430,7 @@ with review:
 
         out = dict(inv, capa=edited)
         st.download_button(
-            "Download investigation report (.docx)",
+            "Export review-ready Word report",
             build_report(CASE, out, st.session_state.get("docs", documents_for(chosen)),
                          reviewer, decision, notes),
             file_name=f"Rootforge_{CASE['id']}_Investigation_Draft.docx",

@@ -1,5 +1,18 @@
 # Rootforge
 
+## YC demo flow (about 2 minutes)
+
+1. Start on **Main demo · Find the operational failure**.
+2. Say: “Six scattered records normally have to be reconciled by hand. Rootforge turns them into one evidence-grounded investigation and a repair plan.”
+3. Keep **Main investigation — find the operational failure** selected and click **Run main investigation**.
+4. Point to **The control changed—but the operation did not**. Explain that SOP v3 introduced a 45-minute escalation trigger, while the technician's current-version training remained incomplete and no escalation was recorded.
+5. Open **Analysis** and show one evidence quote. Then open **Action plan** to show editable recommendations and the report export.
+6. Switch to **AI safety check — catch an unsupported allegation** and click **Run AI safety check**.
+7. Point to the blocked back-dating allegation. Say: “Rootforge preserves the real consent-date discrepancy, but refuses to turn it into an unsupported accusation.”
+8. Close with: “Rootforge finds the important connection, proves where it came from, and shows the operator what to repair.”
+
+The built-in cases are synthetic. DEMO-001 is the primary product story; DEMO-002 is a short safety proof, not a second full investigation.
+
 **Rootforge investigates protocol deviations for clinical-research teams.**
 It reads the raw evidence — deviation report, protocol, SOP, training record,
 handoff log, correspondence — and returns a cited timeline, an explicit list of
@@ -36,7 +49,7 @@ demo is reproducible offline. Replay mode is labelled in the UI; grounding
 verification runs against real source text either way.
 
 ```bash
-pytest        # 15 tests, including adversarial grounding checks
+pytest        # 20 tests, including adversarial grounding and report checks
 ```
 
 ## What the tests cover

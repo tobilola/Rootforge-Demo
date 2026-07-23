@@ -20,35 +20,13 @@ STATUS_MARK = {
 
 def _cite(item):
     if not isinstance(item, dict):
-        return ""
-
-    refs = item.get("refs", [])
-    if isinstance(refs, str):
-        refs_text = refs
-    elif isinstance(refs, (list, tuple)):
-        refs_text = "; ".join(str(ref) for ref in refs)
-    else:
-        refs_text = ""
-
+        return " [Source: no citation]"
+    refs = "; ".join(item.get("refs", [])) or "no citation"
     verification = item.get("verification", {})
-    if isinstance(verification, dict):
-        status = verification.get("status", "")
-    elif isinstance(verification, str):
-        status = verification
-    else:
-        status = ""
-
-    mark = STATUS_MARK.get(status, "")
-    return f" [Source: {refs_text or 'no citation'}]{mark}"
-
-
-def _is_grounded(item):
-    if not isinstance(item, dict):
-        return False
-    verification = item.get("verification", {})
-    return isinstance(verification, dict) and verification.get("status") in (
-        "verified", "paraphrase"
-    )
+    if not isinstance(verification, dict):
+        verification = {}
+    mark = STATUS_MARK.get(verification.get("status", ""), "")
+    return f" [Source: {refs}]{mark}"
 
 
 def build_report(case, investigation, documents, reviewer, decision, notes):
@@ -73,14 +51,18 @@ def build_report(case, investigation, documents, reviewer, decision, notes):
     ]:
         doc.add_paragraph(line, style="List Bullet")
 
-    if ver.get("failures"):
+    failures = ver.get("failures", [])
+    if failures:
         doc.add_heading("Flagged model assertions — excluded from confirmed findings", level=1)
         doc.add_paragraph(
-            "The following statements did not resolve to source text and are "
-            "excluded from confirmed findings and retained for reviewer inspection:"
+            "These statements did not resolve to source text. They are excluded "
+            "from confirmed findings and retained for reviewer inspection."
         )
-        for f in ver["failures"]:
-            doc.add_paragraph(f"{f['text']} — {f['detail']}", style="List Bullet")
+        for f in failures:
+            doc.add_paragraph(
+                f"{f.get('text', '')} — {f.get('detail', 'Grounding check failed')}",
+                style="List Bullet",
+            )
 
     doc.add_heading("Evidence-linked timeline", level=1)
     for item in investigation.get("timeline", []):
@@ -97,11 +79,13 @@ def build_report(case, investigation, documents, reviewer, decision, notes):
     ]:
         doc.add_heading(title, level=1)
         items = investigation.get("findings", {}).get(key, [])
+        if key == "confirmed":
+            items = [item for item in items if isinstance(item, dict) and
+                     item.get("verification", {}).get("status")
+                     not in ("unverified", "bad_ref")]
         if not items:
             doc.add_paragraph("None identified.")
         for item in items:
-            if not _is_grounded(item):
-                continue
             doc.add_paragraph(item.get("text", "") + _cite(item), style="List Bullet")
 
     doc.add_heading("Root-cause hypotheses (not conclusions)", level=1)

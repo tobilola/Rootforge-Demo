@@ -212,13 +212,14 @@ CASES = {
         "case": CASE,
         "documents": DOCUMENTS,
         "replay": "RF-DEMO-001.json",
-        "blurb": "Six records reveal a control change, a training gap, and a missed escalation.",
+        "blurb": "The clean run. 28 of 28 claims ground, 18 by exact match.",
     },
     CASE_2["id"]: {
         "case": CASE_2,
         "documents": DOCUMENTS_2,
         "replay": "RF-DEMO-002.json",
-        "blurb": "A deliberately unsafe model response tests whether an invented motive gets through.",
+        "blurb": "The catch. The model asserts a motive the record never states, "
+                 "and the verifier flags it before a reviewer sees it.",
     },
 }
 

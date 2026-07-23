@@ -85,6 +85,34 @@ html, body, [class*="css"]{ font-family:'Inter',system-ui,sans-serif; }
   padding:1.1rem 1.2rem; margin:.8rem 0; }
 .safety h2{ font-family:'Space Grotesk'; margin:.25rem 0; font-size:1.2rem; color:var(--warn); }
 .safety p{ margin:.2rem 0; color:#74443D; font-size:.86rem; }
+.proof{ border:1px solid var(--line); background:#fff; border-radius:16px; padding:1rem;
+  margin:.7rem 0 1rem; box-shadow:0 8px 24px rgba(11,31,42,.05); }
+.proof-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:.55rem; }
+.proof-node{ position:relative; border:1px solid var(--line); border-radius:12px;
+  padding:.8rem; background:var(--paper); min-height:150px; }
+.proof-node:after{ content:"→"; position:absolute; right:-.48rem; top:42%; color:var(--sig);
+  font-weight:800; z-index:2; }
+.proof-node:last-child:after{ display:none; }
+.proof-node .num{ font-family:'IBM Plex Mono'; color:var(--sig); font-size:.62rem;
+  letter-spacing:.1em; font-weight:600; }
+.proof-node b{ display:block; font-family:'Space Grotesk'; font-size:.88rem;
+  margin:.25rem 0 .4rem; line-height:1.25; }
+.proof-node .proof-quote{ color:var(--mut); font-size:.72rem; line-height:1.35; }
+.proof-node .proof-ref{ display:block; color:var(--sig); font-family:'IBM Plex Mono';
+  font-size:.64rem; margin-top:.45rem; font-weight:600; }
+.action{ border:1px solid var(--line); border-radius:14px; background:#fff; padding:.95rem;
+  margin:.55rem 0; display:grid; grid-template-columns:1.4fr .8fr; gap:1rem; }
+.action h3{ font-family:'Space Grotesk'; font-size:.98rem; margin:0 0 .3rem; }
+.action p{ color:var(--mut); font-size:.8rem; line-height:1.4; margin:.2rem 0; }
+.action-meta{ border-left:1px solid var(--line); padding-left:.9rem; font-size:.75rem; }
+.action-meta div{ margin-bottom:.35rem; }
+.compare{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin:.7rem 0; }
+.compare-card{ border:1px solid var(--line); border-radius:14px; padding:1rem; background:#fff; }
+.compare-card.rootforge{ border-color:var(--sig-line); background:var(--sig-bg); }
+.compare-card h3{ font-family:'Space Grotesk'; margin:0 0 .5rem; font-size:1rem; }
+.compare-card div{ font-size:.8rem; line-height:1.5; margin:.25rem 0; }
+.impact{ font-family:'Space Grotesk'; font-size:1.05rem; color:var(--ink); padding:.9rem 1rem;
+  border-left:4px solid var(--sig); background:#fff; margin:.7rem 0 1rem; }
 
 /* Verdict chip: the signature element */
 .chip{ display:inline-flex; align-items:center; gap:.4rem; font-family:'IBM Plex Mono';
@@ -154,7 +182,9 @@ html, body, [class*="css"]{ font-family:'Inter',system-ui,sans-serif; }
 .stTabs [aria-selected="true"]{ color:var(--ink)!important; }
 [data-testid="stExpander"]{ border:1px solid var(--line); border-radius:10px; background:#fff; }
 hr{ border:none; border-top:1px solid var(--line); margin:1rem 0; }
-@media(max-width:760px){ .hero,.story,.repair-grid{ grid-template-columns:1fr; }
+@media(max-width:760px){ .hero,.story,.repair-grid,.proof-grid,.compare,.action{ grid-template-columns:1fr; }
+  .proof-node:after{ content:"↓"; right:50%; top:auto; bottom:-.65rem; }
+  .action-meta{ border-left:0; border-top:1px solid var(--line); padding:.7rem 0 0; }
   .hero h1{ font-size:1.75rem; } .rail{ grid-template-columns:repeat(2,1fr); } }
 </style>
 """)
@@ -195,6 +225,64 @@ def claim_card(lead, item, category="confirmed"):
     st.markdown(html, unsafe_allow_html=True)
 
 
+def find_item(items, *terms):
+    """Select evidence from the investigation output, never from display copy."""
+    for item in items:
+        haystack = " ".join(str(item.get(k, "")) for k in ("text", "quote", "rationale")).lower()
+        if all(term.lower() in haystack for term in terms):
+            return item
+    return {}
+
+
+def evidence_chain(inv):
+    confirmed = inv.get("findings", {}).get("confirmed", [])
+    timeline = inv.get("timeline", [])
+    return [
+        ("Control changed", find_item(confirmed, "45-minute", "introduced")),
+        ("Training lagged", find_item(confirmed, "training", "never completed")),
+        ("Escalation missed", find_item(timeline, "45 minutes", "no escalation")),
+        ("Failure occurred", find_item(confirmed, "95 minutes", "60-minute")),
+    ]
+
+
+def selected_repairs(inv):
+    capa = inv.get("capa", [])
+    picks = [
+        (find_item(capa, "restrict sample receipt"), "Prevents untrained execution"),
+        (find_item(capa, "mandatory receiver signature"), "Creates accountable custody"),
+        (find_item(capa, "45-minute elapsed-time alert"), "Intervenes before the deadline"),
+    ]
+    return [(item, benefit) for item, benefit in picks if item]
+
+
+def render_proof(inv):
+    chain = evidence_chain(inv)
+    if not all(item for _, item in chain):
+        return
+    html = '<div class="proof"><div class="proof-grid">'
+    for i, (label, item) in enumerate(chain, 1):
+        refs = "; ".join(item.get("refs", []))
+        html += (f'<div class="proof-node"><span class="num">0{i}</span>'
+                 f'<b>{esc(label)}</b><div class="proof-quote">“{esc(item.get("quote", ""))}”</div>'
+                 f'<span class="proof-ref">{esc(refs)} · verified</span></div>')
+    st.markdown(html + '</div></div>', unsafe_allow_html=True)
+
+
+def render_repairs(inv):
+    for item, benefit in selected_repairs(inv):
+        refs = "; ".join(item.get("refs", []))
+        st.markdown(
+            '<div class="action"><div>'
+            f'<h3>{esc(item.get("text", ""))}</h3>'
+            f'<p><b>Why:</b> {esc(item.get("rationale", ""))}</p></div>'
+            '<div class="action-meta">'
+            f'<div><b>Owner</b><br>{esc(item.get("owner_role", "Unassigned"))}</div>'
+            f'<div><b>Evidence</b><br><span class="ref">{esc(refs)}</span></div>'
+            f'<div><b>Expected benefit</b><br>{esc(benefit)}</div>'
+            '<div><span class="chip near"><span class="dot"></span>Human approval required</span></div>'
+            '</div></div>', unsafe_allow_html=True)
+
+
 # --- Outcome-led masthead --------------------------------------------------
 st.markdown(
     '<div class="rf-top"><div class="rf-mark"></div>'
@@ -222,6 +310,8 @@ labels = {
     "RF-DEMO-001": "Main investigation — find the operational failure",
     "RF-DEMO-002": "AI safety check — catch an unsupported allegation",
 }
+if "next_demo" in st.session_state:
+    st.session_state["demo_scenario"] = st.session_state.pop("next_demo")
 st.markdown('<div class="sec"><span class="n">STEP 1</span>Choose the story to show</div>',
             unsafe_allow_html=True)
 chosen = st.selectbox(
@@ -229,6 +319,7 @@ chosen = st.selectbox(
     case_ids,
     format_func=lambda c: labels[c],
     help="Start with the main investigation. Use the AI safety check briefly at the end.",
+    key="demo_scenario",
 )
 if chosen == "RF-DEMO-001":
     st.caption("Recommended first: shows the operational discovery, its evidence, and a repair plan.")
@@ -309,24 +400,45 @@ with setup:
                 'excluded from confirmed findings and retained below and in the report '
                 'for reviewer inspection.</div></div>', unsafe_allow_html=True)
         if chosen == "RF-DEMO-001":
+            chain = evidence_chain(inv)
             st.markdown(
                 '<div class="reveal"><div class="reveal-label">Key operational finding</div>'
                 '<h2>The control changed—but the operation did not.</h2>'
-                '<p>SOP v3 introduced a 45-minute escalation trigger. It was already in force, '
-                'but the technician had only completed training on v2. No escalation was recorded, '
-                'and processing started 95 minutes after collection.</p></div>',
+                '<p>Rootforge joined four independently verified facts across procedure, training, '
+                'handoff, and deviation records. The chain below is assembled from the investigation '
+                'result—not written as a dashboard conclusion.</p></div>',
                 unsafe_allow_html=True)
-            st.markdown('<div class="sec"><span class="n">REPAIR</span>Suggested control improvements</div>',
+            st.markdown('<div class="sec"><span class="n">PROOF</span>The evidence chain</div>',
+                        unsafe_allow_html=True)
+            st.markdown('<div class="sec-note">Four records become one defensible explanation. '
+                        'Every step carries its source and verified quotation.</div>',
+                        unsafe_allow_html=True)
+            render_proof(inv)
+            st.markdown('<div class="sec"><span class="n">ACTION</span>Evidence-linked repair plan</div>',
+                        unsafe_allow_html=True)
+            st.markdown('<div class="sec-note">Suggestions come from the investigation output and '
+                        'remain proposals until a qualified reviewer approves them.</div>',
+                        unsafe_allow_html=True)
+            render_repairs(inv)
+            st.markdown('<div class="impact"><b>Demonstration target:</b> compress initial '
+                        'reconstruction from hours of manual cross-checking to minutes, while '
+                        'keeping every conclusion reviewable.</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sec"><span class="n">WHY</span>Why this is not generic AI</div>',
                         unsafe_allow_html=True)
             st.markdown(
-                '<div class="repair-grid">'
-                '<div class="repair"><b>Close the training gate</b><span>Prevent staff from receiving samples until current-version training is complete.</span></div>'
-                '<div class="repair"><b>Make custody explicit</b><span>Require a named transporter and receiver signature; reject incomplete handoffs.</span></div>'
-                '<div class="repair"><b>Trigger escalation early</b><span>Alert the coordinator when a collected sample reaches 45 minutes unprocessed.</span></div>'
-                '</div>', unsafe_allow_html=True)
-            st.info("Why this matters: Rootforge connected procedure change, training status, "
-                    "handoff evidence and the event log—then converted that connection into "
-                    "reviewable operating repairs.")
+                '<div class="compare">'
+                '<div class="compare-card"><h3>Generic AI</h3>'
+                '<div>Summarizes documents</div><div>Produces plausible answers</div>'
+                '<div>May repeat unsupported claims</div><div>Stops at findings</div></div>'
+                '<div class="compare-card rootforge"><h3>Rootforge</h3>'
+                '<div>Reconstructs the incident across records</div>'
+                '<div>Checks each quotation against source text</div>'
+                '<div>Excludes unsupported assertions</div>'
+                '<div>Creates an accountable, editable repair plan</div></div></div>',
+                unsafe_allow_html=True)
+            if st.button("Show how Rootforge handles an AI mistake →", width="stretch"):
+                st.session_state["next_demo"] = "RF-DEMO-002"
+                st.rerun()
         else:
             failure = ver["failures"][0] if ver["failures"] else {}
             st.markdown(
@@ -336,8 +448,10 @@ with setup:
                 'not exist in the records, so the assertion was excluded from confirmed findings '
                 'and preserved for reviewer inspection.</p></div>', unsafe_allow_html=True)
             st.success("Benefit: reviewers see the discrepancy without inheriting an invented motive.")
-        st.markdown("**Next:** open **3 · Timeline** to show what happened, then **4 · Findings** "
-                    "for the evidence, and finish in **5 · Repair plan** to show the operational benefit.")
+        if chosen == "RF-DEMO-001":
+            st.caption("Optional deep dive: use Timeline, Findings, and Repair plan only if the audience asks.")
+        else:
+            st.caption("Safety proof complete. Return to the main investigation for the full operating story.")
 
 with evidence:
     for d in st.session_state.get("docs", documents_for(chosen)):

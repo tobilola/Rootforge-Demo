@@ -1,15 +1,17 @@
 # Rootforge
 
-## YC demo flow (about 2 minutes)
+## YC demo flow (about 90 seconds)
 
-1. Start on **Main demo · Find the operational failure**.
-2. Say: “Six scattered records normally have to be reconciled by hand. Rootforge turns them into one evidence-grounded investigation and a repair plan.”
-3. Keep **Main investigation — find the operational failure** selected and click **Run main investigation**.
-4. Point to **The control changed—but the operation did not**. Explain that SOP v3 introduced a 45-minute escalation trigger, while the technician's current-version training remained incomplete and no escalation was recorded.
-5. Open **Analysis** and show one evidence quote. Then open **Action plan** to show editable recommendations and the report export.
-6. Switch to **AI safety check — catch an unsupported allegation** and click **Run AI safety check**.
-7. Point to the blocked back-dating allegation. Say: “Rootforge preserves the real consent-date discrepancy, but refuses to turn it into an unsupported accusation.”
-8. Close with: “Rootforge finds the important connection, proves where it came from, and shows the operator what to repair.”
+1. Keep **Main investigation — find the operational failure** selected.
+2. Say: “Six scattered records normally have to be reconciled by hand. Rootforge turns them into one evidence-grounded investigation and repair plan.”
+3. Click **Run main investigation**.
+4. Follow the four-card evidence chain from the changed control through the missed escalation to the failure. Point out that every step shows its source and verified quotation.
+5. Show the evidence-linked repairs: action, rationale, owner, source records, expected benefit, and human-approval status.
+6. Contrast **Generic AI** with **Rootforge**, then click **Show how Rootforge handles an AI mistake**.
+7. Click **Run AI safety check** and point to the blocked back-dating allegation. Say: “Rootforge preserves the real discrepancy but refuses to turn it into an unsupported accusation.”
+8. Close with: “Rootforge finds what happened, proves every conclusion, and helps the operator prevent it happening again.”
+
+The main result, evidence chain, repairs, competitive difference, and safety handoff now appear in one guided presentation flow. The numbered tabs remain available only for questions or deeper inspection.
 
 The built-in cases are synthetic. DEMO-001 is the primary product story; DEMO-002 is a short safety proof, not a second full investigation.
 

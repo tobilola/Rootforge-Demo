@@ -1,35 +1,6 @@
-# Secrets and local configuration
-.env
-.env.*
-!.env.example
-.streamlit/secrets.toml
-
-# Python environments and caches
-.venv/
-venv/
-env/
 __pycache__/
-*.py[cod]
+*.pyc
+.venv/
+.env
+.streamlit/secrets.toml
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
-coverage.xml
-.coverage
-htmlcov/
-
-# Generated Rootforge output
-*.docx
-*.pdf
-reports/
-output/
-
-# Editors and operating systems
-.DS_Store
-Thumbs.db
-.idea/
-.vscode/
-
-# Packaging and build output
-build/
-dist/
-*.egg-info/

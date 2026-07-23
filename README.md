@@ -51,7 +51,17 @@ demo is reproducible offline. Replay mode is labelled in the UI; grounding
 verification runs against real source text either way.
 
 ```bash
-pytest        # 20 tests, including adversarial grounding and report checks
+pytest        # 21 tests, including adversarial grounding and report checks
+```
+
+For Render, use:
+
+```bash
+# Build command
+pip install -r requirements.txt
+
+# Start command
+python -m streamlit run app.py --server.address 0.0.0.0 --server.port $PORT --server.headless true
 ```
 
 ## What the tests cover
